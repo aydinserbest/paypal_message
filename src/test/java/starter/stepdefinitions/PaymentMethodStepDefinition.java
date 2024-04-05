@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PaymentMethodStepDefinition {
-    @Given("a shop owner has a {word} account")
+    @Given("a shop owner has a {} account")
     public void aShopOwnerHasAAccountTypeAccount(AccountType accountType) {
     }
 
