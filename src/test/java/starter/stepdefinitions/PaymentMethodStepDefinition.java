@@ -6,18 +6,30 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import payments.domain.PaymentMethod;
 import payments.domain.accounts.AccountType;
+import payments.domain.accounts.CustomerAccount;
+import payments.service.PaymentService;
 
 import java.util.List;
 import java.util.Map;
 
 public class PaymentMethodStepDefinition {
-    @Given("a shop owner has a {} account")
-    public void aShopOwnerHasAAccountTypeAccount(AccountType accountType) {
+    @ParameterType("Standard|Premium")
+    public AccountType accountType(String value) {
+        return AccountType.valueOf(value);
     }
+    CustomerAccount customerAccount;
+    @Given("a shop owner has a {accountType} account")
+    public void aShopOwnerHasAAccountTypeAccount(AccountType accountType) {
+        customerAccount = ACustomerAccount.ofType(accountType);
+    }
+    PaymentService paymentService = new PaymentService();
+    PaymentMethod supportedPaymentMethod;
 
     @When("the supported card payments are requested")
     public void theSupportedCardPaymentsAreRequested() {
+        supportedPaymentMethod = paymentService.getSupportedCardPaymentsForAccount(customerAccount.getAccountNumber());
     }
     @ParameterType(".*")
     public List<String> cardNetworks(String value) {
