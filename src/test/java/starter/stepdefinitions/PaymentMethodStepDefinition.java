@@ -7,6 +7,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import payments.domain.PaymentMethod;
+import payments.domain.accounts.AccountService;
 import payments.domain.accounts.AccountType;
 import payments.domain.accounts.CustomerAccount;
 import payments.service.PaymentService;
@@ -14,17 +15,22 @@ import payments.service.PaymentService;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class PaymentMethodStepDefinition {
     @ParameterType("Standard|Premium")
     public AccountType accountType(String value) {
         return AccountType.valueOf(value);
     }
     CustomerAccount customerAccount;
+    AccountService accountService = new AccountService();
+
+    PaymentService paymentService = new PaymentService(accountService);
+
     @Given("a shop owner has a {accountType} account")
     public void aShopOwnerHasAAccountTypeAccount(AccountType accountType) {
-        customerAccount = ACustomerAccount.ofType(accountType);
+        customerAccount = accountService.newAccountOfType(accountType);
     }
-    PaymentService paymentService = new PaymentService();
     PaymentMethod supportedPaymentMethod;
 
     @When("the supported card payments are requested")
@@ -36,7 +42,10 @@ public class PaymentMethodStepDefinition {
         return Splitter.on(',').splitToList(value);
     }
     @Then("the allowed card networks should be {cardNetworks}")
-    public void theAllowedCardNetworksShouldBeAllowedCardNetworks(List<String> allowedCardNetworks) {
+    public void theAllowedCardNetworksShouldBeAllowedCardNetworks(List<String> expectedCardNetworks) {
+        List<String> actualCardNetworks = (List<String>) supportedPaymentMethod.getParameters().get("allowedCardNetworks");
+        assertThat(actualCardNetworks).containsExactlyInAnyOrderElementsOf(expectedCardNetworks);
+
     }
 
     @Given("Gavin has a Premium account")
