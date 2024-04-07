@@ -1,10 +1,11 @@
 package payments.domain.accounts;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class AccountService {
-    List<CustomerAccount> accounts; // <1>
+    List<CustomerAccount> accounts=new ArrayList<>(); // <1>
     public CustomerAccount newAccountOfType(AccountType accountType) {
         CustomerAccount newAccount = new CustomerAccount(accountType);
         accounts.add(newAccount);

@@ -5,6 +5,7 @@ import payments.domain.accounts.AccountService;
 import payments.domain.accounts.AccountType;
 import payments.domain.accounts.CustomerAccount;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +19,11 @@ public class PaymentService {
 
     public PaymentMethod getSupportedCardPaymentsForAccount(Long accountNumber) {
 
-        CustomerAccount account = accountService.findByAccountNumber(accountNumber).get();
+        CustomerAccount account = accountService.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
         PaymentMethod paymentMethod = new PaymentMethod();
         paymentMethod.setType("CARD");
-        List<String> supportedCards = Arrays.asList("VISA", "MASTERCARD");
+        List<String> supportedCards = new ArrayList<>(Arrays.asList("VISA", "MASTERCARD")); // Yeni bir ArrayList oluşturuldu
         if (account.getAccountType() == AccountType.PREMIUM) {
             supportedCards.add("AMEX");
         }

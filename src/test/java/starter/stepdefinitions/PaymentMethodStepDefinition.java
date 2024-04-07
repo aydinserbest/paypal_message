@@ -14,13 +14,14 @@ import payments.service.PaymentService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PaymentMethodStepDefinition {
     @ParameterType("Standard|Premium")
     public AccountType accountType(String value) {
-        return AccountType.valueOf(value);
+        return AccountType.valueOf(value.toUpperCase());
     }
     CustomerAccount customerAccount;
     AccountService accountService = new AccountService();
@@ -39,7 +40,11 @@ public class PaymentMethodStepDefinition {
     }
     @ParameterType(".*")
     public List<String> cardNetworks(String value) {
-        return Splitter.on(',').splitToList(value);
+        return Splitter.on(',')
+                .splitToList(value)
+                .stream()
+                .map(String::trim)  // Her bir elemanı trim'le.
+                .collect(Collectors.toList());
     }
     @Then("the allowed card networks should be {cardNetworks}")
     public void theAllowedCardNetworksShouldBeAllowedCardNetworks(List<String> expectedCardNetworks) {
@@ -50,6 +55,7 @@ public class PaymentMethodStepDefinition {
 
     @Given("Gavin has a Premium account")
     public void gavinHasAPremiumAccount() {
+        customerAccount = accountService.newAccountOfType(AccountType.PREMIUM);
     }
 
     @And("Gavin has disabled credit card support")
